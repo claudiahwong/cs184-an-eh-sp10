@@ -12,10 +12,12 @@ class DirectionalLight :
 public:
 	vec3 myDirection;
 	Color myColor;
+	double attenuation[3];
 
 	DirectionalLight(vec3 direction, Color *color);
 	DirectionalLight(void);
 	~DirectionalLight(void);
 
 	void generateLightRay(LocalGeo &local, Ray *lray, Color *lcolor);
+	void getAttenuation(double* att);
 };

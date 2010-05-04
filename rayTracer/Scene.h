@@ -27,6 +27,10 @@ public:
 	char output_name[300];
 	vector<Primitive*> myPrimitivesVector;
 
+	double ConstAtt,
+		   LinAtt,
+		   QuadAtt;
+	
 	vector<Light*> myLightsVector;
 	BRDF currBRDF;
 

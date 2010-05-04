@@ -26,8 +26,6 @@ int curvert = 0, curvertnorm = 0 ;
 int maxdepth = 5 ;
 int lightnum = 0 ;
 
-double attenuation[3] = {1.0, 0.0, 0.0} ;
-
 FILE *inputfile ;
 
 int parsed = 0 ;
@@ -102,8 +100,9 @@ void parsefile (FILE *fp) {
 
 			Sphere *newSphere = new Sphere(*pos, *(pos+1), *(pos+2), radius, *mainCam);
 			BRDF *sphereBRDF = new BRDF(mainScene->currBRDF.myKd, mainScene->currBRDF.myKs, 
-										mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
-										mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess);
+				mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
+				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess,
+				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract);
 			Material *sphereMat = new Material(sphereBRDF);
 			
 			mat4 current = mainScene->getCurrentMatrix();
@@ -197,8 +196,9 @@ void parsefile (FILE *fp) {
 			Transformation objToWorld = Transformation(current);
 
 			BRDF *triBRDF = new BRDF(mainScene->currBRDF.myKd, mainScene->currBRDF.myKs, 
-										mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
-										mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess);
+				mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
+				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess,
+				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract);
 			Material *triMat = new Material(triBRDF);
 			GeometricPrimitive *triPrim = new GeometricPrimitive(newTriangle, triMat, objToWorld, worldToObj);
 			mainScene->addPrimitive(triPrim);
@@ -230,7 +230,8 @@ void parsefile (FILE *fp) {
 
 			BRDF *triBRDF = new BRDF(mainScene->currBRDF.myKd, mainScene->currBRDF.myKs, 
 				mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
-				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess);
+				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess,
+				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract);
 			Material *triMat = new Material(triBRDF);
 			GeometricPrimitive *triPrim = new GeometricPrimitive(newTriangle, triMat, objToWorld, worldToObj);
 			mainScene->addPrimitive(triPrim);
@@ -326,18 +327,27 @@ void parsefile (FILE *fp) {
 			int num = sscanf(line, "%s %f %f %f %f %f %f", command, direction, direction+1, direction+2, color, color+1, color+2) ;
 			assert(num == 7) ;
 			assert(lightnum >= 0) ;
-
+			
+			double att[3];
+			att[0] = mainScene->ConstAtt;
+			att[1] = mainScene->LinAtt;
+			att[2] = mainScene->QuadAtt;
 			Color *newColor = new Color(*color, *(color+1), *(color+2));
-			PointLight *newLight = new PointLight(direction[0], direction[1], direction[2], *newColor);
+			PointLight *newLight = new PointLight(direction[0], direction[1], direction[2], *newColor, att);
 			mainScene->addLight(newLight);
 
 			++lightnum ;	 
 		}
 
 		else if (!strcmp(command, "attenuation")) {
+			double attenuation[3] = {1.0, 0.0, 0.0};
 			int num = sscanf(line, "%s %lf %lf %lf", command, attenuation, attenuation + 1, attenuation +2) ;
 			assert(num == 4) ;
 			assert(!strcmp(command, "attenuation")) ;
+			mainScene->ConstAtt = attenuation[0];
+			mainScene->LinAtt = attenuation[1];
+			mainScene->QuadAtt = attenuation[2];
+
 		}
 
 		else if (!strcmp(command, "ambient")) {
@@ -385,6 +395,14 @@ void parsefile (FILE *fp) {
 			int num = sscanf(line, "%s %f %f %f", command, reflect, reflect+1, reflect+2) ;
 			assert(num == 4) ; assert (!strcmp(command, "reflect")) ;
 			mainScene->currBRDF.myKr.setEqual(Color(reflect[0], reflect[1], reflect[2]));
+		}
+
+		else if (!strcmp(command, "refract")) {
+			float refract[4] ;
+			int num = sscanf(line, "%s %f %f %f", command, refract, refract+1, refract+2) ;
+			assert(num == 4) ; assert (!strcmp(command, "refract")) ;
+			mainScene->currBRDF.myKrefract.setEqual(Color(refract[0], refract[1], refract[2]));
+			mainScene->currBRDF.myRIndex = refract[3]; 
 		}
 
 		//..................................................

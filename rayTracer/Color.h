@@ -76,6 +76,17 @@ public:
 		this->b/=c1.b;
 		return *this;
 	}
+
+	const Color operator/(const double &d)	{
+		return Color(this->r / d, this->g / d, this->b / d);
+	}
+
+	const Color operator/=(const double &d) {
+		this->r/=d; 
+		this->g/=d; 
+		this->b/=d;
+		return *this;
+	}
 	
 	const bool operator>(const double &num) {
 		return (this->r > num || this->g > num || this->b > num);

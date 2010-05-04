@@ -38,9 +38,7 @@ bool GeometricPrimitive::intersect(Ray& ray, double* thit, Intersection *in) {
 	if(!myShape->intersect(oray, thit, &olocal)) return false;
 	in->primitive = this;
 	in->localGeo.normal = (objToWorld*olocal).normal;
-	in->localGeo.pos.myX = (objToWorld*olocal).pos.myX;
-	in->localGeo.pos.myY = (objToWorld*olocal).pos.myY;
-	in->localGeo.pos.myZ = (objToWorld*olocal).pos.myZ;
+	in->localGeo.pos = (objToWorld*olocal).pos;
 	return true;
 }
 
