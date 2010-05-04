@@ -17,6 +17,7 @@ public:
 	RayTracer(void);
 	~RayTracer(void);
 	void trace(Ray& ray, int depth, Color* color);
-	Color shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray);
+	Color shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray, double totalAttenuation);
 	Ray createReflectedRay(LocalGeo local, Ray &ray);
+	Ray createRefractedRay(LocalGeo local, Ray &ray, float rindex, bool* refract);
 };

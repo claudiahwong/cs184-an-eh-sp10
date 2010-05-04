@@ -47,46 +47,43 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 		// Check if the light is blocked or not
 		if (!myPrimitive->intersectP(*lray)) {
 			// If not, do shading calculation for this
-			*color += shade(myIn->localGeo, *brdf, *lray, *lcolor, ray);
+			double att[3];
+			(*l)->getAttenuation(att);
+			double d = lray->pos.dist(myIn->localGeo.pos);
+			double totalAtt = att[0] + att[1] * d + att[2] * pow(d, 2);
+			*color += shade(myIn->localGeo, *brdf, *lray, *lcolor, ray, totalAtt);
 		}
 	}
 
-	/*if (color->r > 1) color->r = 1;
-	if (color->g > 1) color->g = 1;
-	if (color->b > 1) color->b = 1;*/
-
 	Ray *reflectedRay = new Ray();
-	Color tempColor;
+	Color *tempColor = new Color();
 	// Handle mirror reflection
 	if (brdf->myKr > 0) {
 		*reflectedRay = createReflectedRay(myIn->localGeo, ray);
 		//Make a recursive call to trace the reflected ray
-		trace(*reflectedRay, depth+1, &tempColor);
-		*color += (brdf->myKr * tempColor);
+		trace(*reflectedRay, depth+1, tempColor);
+		*color += (brdf->myKr * (*tempColor));
 	}
 
-	/*if (color->r > 1) color->r = 1;
-	if (color->g > 1) color->g = 1;
-	if (color->b > 1) color->b = 1;*/
+	Ray *refractedRay = new Ray();
+	Color *tempColor2 = new Color();
+	bool *refract = new bool;
+	// Handle refraction next
+	if (brdf->myKrefract > 0) {
+		*refractedRay = createRefractedRay(myIn->localGeo, ray, brdf->myRIndex, refract);
+		if (*refract == true){
+			trace(*refractedRay, depth+1, tempColor);
+			*color += (brdf->myKrefract * (*tempColor));
+		}
+	}
 }
 
-Color RayTracer::shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray)
+Color RayTracer::shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray, double totalAttenuation)
 {
 	Color result = Color(0.0, 0.0, 0.0);
-	
-	vec3 lrayDir = lray.dir;
-	lrayDir.normalize();
-	vec3 rayDir = ray.dir;
-	rayDir.normalize();
-
-	vec3 half_angle = vec3(lrayDir - rayDir);
-	half_angle.normalize();
-
-	/*lray.dir.normalize();
-	ray.dir.normalize();
 
 	vec3 half_angle = vec3(lray.dir - ray.dir);
-	half_angle.normalize();*/
+	half_angle.normalize();
 	
 	double ldirDotN = dot(lray.dir, local.normal); 
 	if (ldirDotN < 0) ldirDotN = 0;
@@ -101,24 +98,45 @@ Color RayTracer::shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &r
 	Color kdTermPlusKsTerm;
 	kdTermPlusKsTerm.setEqual(kdTerm + ksTerm);
 	Color theRest;
-	theRest.setEqual(lcolor * kdTermPlusKsTerm);
+	Color LightColor;
+	LightColor.setEqual(lcolor);
+	LightColor/=(totalAttenuation);
+	theRest.setEqual(LightColor * kdTermPlusKsTerm);
 	result += theRest;
 	return result;
 }
 
 Ray RayTracer::createReflectedRay(LocalGeo local, Ray &ray) {
 	vec3 reflectedDir;
-	
-	vec3 rayDir = ray.dir;
-	rayDir.normalize();
 
-	double rayDirDotNormal = dot(rayDir, local.normal);
-	vec3 Ndirection = scale(local.normal, 2*rayDirDotNormal);
-	//vec3 mult2 = scale(Ndirection, 2);
-	reflectedDir = rayDir - Ndirection;
+	double rayDirDotNormal = dot(ray.dir, local.normal);
+	vec3 normal = local.normal;
+	vec3 Ndirection = (2*rayDirDotNormal) * normal;
+	reflectedDir = ray.dir - Ndirection;
+	reflectedDir.normalize();
 
 	vec3 pos = vec3(local.pos.myX, local.pos.myY, local.pos.myZ);
-	vec3 resultingPos = pos + .001 * reflectedDir;
+	vec3 resultingPos = pos + .01 * reflectedDir;
 	Point Pos = Point(resultingPos.x, resultingPos.y, resultingPos.z);
 	return Ray(Pos, reflectedDir, 0, 8000);
+}
+
+Ray RayTracer::createRefractedRay(LocalGeo local, Ray &ray, float rindex, bool* refract) {
+	
+	float n = 1/rindex;
+	vec3 N = vec3(local.normal);
+	/*if (dot(local.normal, ray.dir) < 0) {
+		N *= -1;
+	}*/
+	double cosI = dot(N, ray.dir);
+	double sinT2 = n * n * (1.0 - cosI * cosI);
+	if (sinT2 > 1.0)
+	{
+		*refract = false;
+		return Ray();
+	}
+	*refract = true;
+	return Ray(local.pos, n * ray.dir - (n + sqrt(1 - sinT2)) * N, 0, 8000);
+	
+
 }

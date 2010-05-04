@@ -10,4 +10,5 @@ public:
 	~Light(void);
 
 	virtual void generateLightRay(LocalGeo &local, Ray *lray, Color *lcolor)=0;
+	virtual void getAttenuation(double* att)=0;
 };

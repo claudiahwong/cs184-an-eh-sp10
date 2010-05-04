@@ -32,19 +32,18 @@ bool Sphere::intersect(Ray& ray, double* t_hit, LocalGeo* local) {
 		}
 		if (*t_hit > 0) {
 			// setting pos
-			//vec3 result = vec3(ray.pos.myX, ray.pos.myY, ray.pos.myZ) + (*t_hit)*(ray.dir);
-			/*local->pos = Point(result.x, result.y, result.z);*/
-			(local->pos).myX = ray.pos.myX + *t_hit * (ray.dir).x;
+			vec3 result = vec3(ray.pos.myX, ray.pos.myY, ray.pos.myZ) + (*t_hit)*(ray.dir);
+			local->pos = Point(result.x, result.y, result.z);
+			/*(local->pos).myX = ray.pos.myX + *t_hit * (ray.dir).x;
 			(local->pos).myY = ray.pos.myY + *t_hit * (ray.dir).y;
-			(local->pos).myZ = ray.pos.myZ + *t_hit * (ray.dir).z;
+			(local->pos).myZ = ray.pos.myZ + *t_hit * (ray.dir).z;*/
 
 			// setting normal
 			local->normal = vec3((local->pos).myX - x, (local->pos).myY - y, (local->pos).myZ - z);
 			(local->normal).normalize();
 
 			return true;
-		}
-		return false;
+		} else return false;
 	} else {
 		return false;
 	}

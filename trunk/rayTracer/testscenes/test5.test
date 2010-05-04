@@ -4,39 +4,57 @@ camera 0 0 0 0 0 -3 0 1 0 40
 
 directional 0.57735027 -0.57735027 -0.57735027 1 1 1
 directional -0.57735027  0.57735027  0.57735027 1 1 1
+
 maxdepth 5
 
 ambient .1 .1 .1
-diffuse 1 0 0
+diffuse .5 0 0
 specular 1 1 1
 reflect .9 .9 .9
 shininess 50
 sphere 0 0 -17 2
 
 ambient .1 .1 .1
-diffuse 0 1 0
+diffuse 0 .5 0
 specular 1 1 1
 reflect .9 .9 .9
 shininess 50
 sphere 0 4 -17 1.5
 
 ambient .1 .1 .1
-diffuse 0 0 1
+diffuse 0 0 .5
 specular 1 1 1
 reflect .9 .9 .9
 shininess 50
 sphere 0 -4 -17 1.5
 
 ambient .1 .1 .1
-diffuse 1 1 0
+diffuse .5 .5 0
 specular 1 1 1
 reflect .9 .9 .9
 shininess 50
 sphere 4 0 -17 1.5
 
 ambient .1 .1 .1
-diffuse 0 1 1
+diffuse 0 .5 .5
 specular 1 1 1
 reflect .9 .9 .9
 shininess 50
 sphere -4 0 -17 1.5
+
+
+ambient 0 0 0
+diffuse 0 0 0
+specular 0 0 0
+reflect 1 1 1
+shininess 50
+
+maxverts 4
+
+vertex -6 -6 -21
+vertex 6 -6 -21
+vertex 6 6 -21
+vertex -6 6 -21
+
+tri 0 1 2
+tri 0 2 3

@@ -7,6 +7,10 @@ Scene::Scene(int sizex, int sizey)
 	mySizey = sizey;
 	currMatElems.push_back(mat4_id);
 	currBRDF.myKa = Color(0.2, 0.2, 0.2);
+	currBRDF.myRIndex = 1;
+	ConstAtt = 1;
+	LinAtt = 0;
+	QuadAtt = 0;
 	strcpy(output_name, "out.ppm");
 	myMaxDepth = 5;
 }
@@ -23,7 +27,7 @@ void Scene::setCamera(Camera *mainCam) {
 	myCamera.fovy = mainCam->fovy;
 	myCamera.screenHeight = mainCam->screenHeight;
 	myCamera.screenWidth = mainCam->screenWidth;
-}
+}    
 
 void Scene::addPrimitive(Primitive* prim) {
 	myPrimitivesVector.push_back(prim);
@@ -110,7 +114,6 @@ void Scene::render() {
 	while(mySampler->getSample(mySample)) {
 		testingColor = new Color();
 		myCamera.generateRay(*mySample, myRay);
-		//if (mySample->x == 299 && mySample->y == 244)
 		myRayTracer->trace(*myRay, 0, testingColor);
 		myFilm->setColor(*mySample, *testingColor);
 		delete testingColor;

@@ -1,12 +1,14 @@
 #include "BRDF.h"
 
-BRDF::BRDF(Color kd, Color ks, Color ka, Color kr, Color ke, float shininess)
+BRDF::BRDF(Color kd, Color ks, Color ka, Color kr, Color ke, float shininess, float rindex, Color krefract)
 {
 	(this->myKd).setEqual(kd);
 	(this->myKs).setEqual(ks);
 	(this->myKa).setEqual(ka);
 	(this->myKr).setEqual(kr);
 	(this->myKe).setEqual(ke);
+	(this->myKrefract).setEqual(krefract);
+	myRIndex = rindex;
 	myShininess = shininess;
 }
 
@@ -17,6 +19,8 @@ BRDF::BRDF(void)
 	myKa = Color(0, 0, 0);
 	myKr = Color(0, 0, 0);
 	myKe = Color(0, 0, 0);
+	myKrefract = Color(0, 0, 0);
+	myRIndex = 1;
 	myShininess = 0;
 }
 
@@ -30,5 +34,7 @@ void BRDF::setEqual(BRDF dest) {
 	(this->myKa).setEqual(dest.myKa);
 	(this->myKr).setEqual(dest.myKr);
 	(this->myKe).setEqual(dest.myKe);
+	(this->myKrefract).setEqual(dest.myKr);
 	myShininess = dest.myShininess;
+	myRIndex = dest.myRIndex;
 }

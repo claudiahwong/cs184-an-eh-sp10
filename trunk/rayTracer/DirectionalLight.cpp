@@ -4,6 +4,7 @@
 DirectionalLight::DirectionalLight(vec3 direction, Color *color) 
 {
 	myDirection = vec3(direction);
+	myDirection.normalize();
 	myColor = Color(color->r, color->g, color->b);
 }
 
@@ -32,4 +33,10 @@ void DirectionalLight::generateLightRay(LocalGeo &local, Ray *lray, Color *lcolo
 	lray->dir = myDirection;
 	lray->t_min = 0;
 	lray->t_max = 100000000; // hundred million
+}
+
+void DirectionalLight::getAttenuation(double* att) {
+	*att = 1;
+	*(att+1) = 0;
+	*(att+2) = 0;
 }
