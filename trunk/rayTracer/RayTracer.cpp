@@ -123,11 +123,12 @@ Ray RayTracer::createReflectedRay(LocalGeo local, Ray &ray) {
 
 Ray RayTracer::createRefractedRay(LocalGeo local, Ray &ray, float rindex, bool* refract) {
 	
-	float n = 1/rindex;
+	float n = 1.0 / rindex;
 	vec3 N = vec3(local.normal);
-	/*if (dot(local.normal, ray.dir) < 0) {
+	if (dot(local.normal, ray.dir) > 0) {
 		N *= -1;
-	}*/
+		n = rindex;
+	}
 	double cosI = dot(N, ray.dir);
 	double sinT2 = n * n * (1.0 - cosI * cosI);
 	if (sinT2 > 1.0)
@@ -136,7 +137,11 @@ Ray RayTracer::createRefractedRay(LocalGeo local, Ray &ray, float rindex, bool* 
 		return Ray();
 	}
 	*refract = true;
-	return Ray(local.pos, n * ray.dir - (n + sqrt(1 - sinT2)) * N, 0, 8000);
-	
+	vec3 result = vec3(n * ray.dir - (n + sqrt(1 - sinT2)) * N);
+	result.normalize();
+	vec3 pos = vec3(local.pos.myX, local.pos.myY, local.pos.myZ);
+	pos += (.01 * result);
+
+	return Ray(Point(pos.x, pos.y, pos.z), result, 0, 8000);
 
 }
