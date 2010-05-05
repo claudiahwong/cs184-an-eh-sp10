@@ -7,7 +7,7 @@ class Film
 {
 protected:
 	int sceneWidth, sceneHeight, currIndex;
-	Sample *mySamples;
+	//Sample *mySamples;
 	Color *myColors;
 	unsigned char *myBuff;
 

@@ -4,7 +4,7 @@ Sample::Sample(void)
 {
 }
 
-Sample::Sample(int posx, int posy)
+Sample::Sample(float posx, float posy)
 {
 	x = posx; 
 	y = posy;

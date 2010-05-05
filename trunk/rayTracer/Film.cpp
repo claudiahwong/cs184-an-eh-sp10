@@ -5,7 +5,7 @@ Film::Film(int scenex, int sceney)
 	sceneWidth = scenex;
 	sceneHeight = sceney;
 	currIndex = 0;
-	mySamples = new Sample [sceneWidth * sceneHeight];
+	//mySamples = new Sample [sceneWidth * sceneHeight];
 	myColors = new Color [sceneWidth * sceneHeight];
 	myBuff = new unsigned char [3 * sceneWidth * sceneHeight + 1];
 }
@@ -26,7 +26,7 @@ void Film::convertToString() {
 void Film::setColor(Sample &sample, Color &color)
 {
 	if (currIndex < sceneWidth * sceneHeight) {
-		mySamples[currIndex] = Sample(sample.x, sample.y);
+		//mySamples[currIndex] = Sample((float)sample.x, (float)sample.y);
 		myColors[currIndex] = Color(color.r, color.g, color.b);
 		currIndex++;
 	}

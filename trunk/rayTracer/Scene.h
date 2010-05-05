@@ -38,6 +38,8 @@ public:
 	vector<mat4> currMatElems; // Contains S,T,R if M = R*T*S
 	Camera myCamera;
 
+	int n; // Sample number per pixel
+
 	void render();
 	void setCamera(Camera *mainCam);
 	void addPrimitive(Primitive* prim);
