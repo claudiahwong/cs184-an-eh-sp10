@@ -13,6 +13,9 @@ Scene::Scene(int sizex, int sizey)
 	QuadAtt = 0;
 	strcpy(output_name, "out.ppm");
 	myMaxDepth = 5;
+
+	n = 2; // Default 4x Antialiasing
+	srand(time(NULL));
 }
 
 Scene::~Scene(void)
@@ -105,18 +108,59 @@ void Scene::render() {
 	Sample *mySample = new Sample();
 	Film *myFilm = new Film(mySizex, mySizey);
 	Color *testingColor = new Color();
+	Color *resultColor = new Color(); // After averaging for antialiasing
 	//Color *testBlack = new Color(0, 0, 0);
+	
+	float totalR, totalG, totalB;
+	totalR = 0.0; totalG = 0.0; totalB = 0.0;
+	
 	Ray *myRay = new Ray();
 	double *thit = new double;
 	Intersection *in = new Intersection();
 	RayTracer *myRayTracer = new RayTracer(this, thit, in, myMaxDepth);
-
+	
+	int nSquared = n*n; // n^2 = samples per pixel
+	float epsilon;
+	
 	while(mySampler->getSample(mySample)) {
-		testingColor = new Color();
-		myCamera.generateRay(*mySample, myRay);
-		myRayTracer->trace(*myRay, 0, testingColor);
-		myFilm->setColor(*mySample, *testingColor);
-		delete testingColor;
+		resultColor = new Color();
+		int p, q;
+		if (n > 1) { // This is the antialiasing code
+			for (p = 0; p < n; p++)
+			{
+				for (q = 0; q < n; q++) {
+
+					epsilon = (float)rand()/RAND_MAX;
+					mySample->x += ((p+epsilon)/(float)n);
+					mySample->y += ((q+epsilon)/(float)n);
+					myCamera.generateRay(*mySample, myRay);
+					myRayTracer->trace(*myRay, 0, testingColor);
+					
+					totalR += testingColor->r;
+					totalG += testingColor->g;
+					totalB += testingColor->b;
+					testingColor->r = 0;
+					testingColor->g = 0;
+					testingColor->b = 0;
+				}
+			}
+
+			totalR /= (float) nSquared;
+			totalG /= (float) nSquared;
+			totalB /= (float) nSquared;
+			resultColor->r = totalR;
+			resultColor->g = totalG;
+			resultColor->b = totalB;
+			totalR = 0.0; totalG = 0.0; totalB = 0.0;
+		} else { // If antialiasing == 1, just do the old code without wasting computation
+			myCamera.generateRay(*mySample, myRay);
+			myRayTracer->trace(*myRay, 0, resultColor);
+		}
+
+
+		myFilm->setColor(*mySample, *resultColor);
+		delete resultColor;
+		
 	}
 	myFilm->writeImage(output_name);
 	

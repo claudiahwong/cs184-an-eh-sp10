@@ -3,8 +3,8 @@
 class Sample
 {
 public:
-	int x, y;
+	float x, y;
 	Sample(void);
-	Sample(int posx, int posy);
+	Sample(float posx, float posy);
 	~Sample(void);
 };

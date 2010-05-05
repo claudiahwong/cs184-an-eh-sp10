@@ -1,6 +1,9 @@
 #pragma once
 #include "Sample.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <Math.h>
+#include <time.h>
 
 class Sampler
 {

@@ -13,21 +13,21 @@ refract 1 1 1 1.6
 shininess 50
 sphere 0 0 -17 5
 
-ambient .1 .7 .1
-diffuse 0 .5 0
-specular 1 1 1
-reflect .7 .7 .7
-refract 0 0 0 1.6 
-shininess 50
-sphere -2 0 -20 1.5
+#ambient .1 .7 .1
+#diffuse 0 .5 0
+#specular 1 1 1
+#reflect .7 .7 .7
+#refract 0 0 0 1.6 
+#shininess 50
+#sphere -2 0 -20 1.5
 
-ambient .1 .7 .1
-diffuse 0 .5 0
-specular 1 1 1
-reflect .7 .7 .7
-refract 0 0 0 1.6 
-shininess 50
-sphere 2 0 -20 1.5
+#ambient .1 .7 .1
+#diffuse 0 .5 0
+#specular 1 1 1
+#reflect .7 .7 .7
+#refract 0 0 0 1.6 
+#shininess 50
+#sphere 2 0 -20 1.5
 
 
 

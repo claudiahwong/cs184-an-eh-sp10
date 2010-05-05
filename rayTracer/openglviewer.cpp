@@ -305,6 +305,15 @@ void parsefile (FILE *fp) {
 			printf("Output image file set to: %s\n",out) ;
 		}
 
+		else if (!strcmp(command, "antialias")) {
+			int n;
+			int num = sscanf(line, "%s %d", command, &n);
+			assert(num == 2);
+			assert(!strcmp(command, "antialias"));
+			mainScene->n = n;
+			printf("%dx Antialiasing Set\n");
+		}
+
 		//..................................................
 
 		//.........................LIGHTS.........................
@@ -407,10 +416,10 @@ void parsefile (FILE *fp) {
 
 		//..................................................
 
-		/*else {
+		else {
 			fprintf(stderr, "Unimplemented command: %s\n", command) ;
 			exit(1) ;
-		}*/
+		}
 		/*GLenum g = glGetError() ;
 		if (g != GL_NO_ERROR) {
 			fprintf(stderr, "Error: %d\n",g) ;

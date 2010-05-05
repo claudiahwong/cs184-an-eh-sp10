@@ -18,9 +18,12 @@ RayTracer::~RayTracer(void)
 
 void RayTracer::trace(Ray& ray, int depth, Color* color) {
 	
-	BRDF *brdf = new BRDF();
+	/*BRDF *brdf = new BRDF();
 	Ray *lray = new Ray();
-	Color *lcolor = new Color();
+	Color *lcolor = new Color();*/
+	BRDF brdf = BRDF();
+	Ray lray = Ray();
+	Color lcolor = Color();
 
 	if (depth > myMaxDepth) {
 		color->r = 0.0;
@@ -38,44 +41,57 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 	}
 
 	// Obtain the brdf at intersection point
-	myIn->primitive->getBRDF(myIn->localGeo, brdf);
+	myIn->primitive->getBRDF(myIn->localGeo, &brdf);
 
-	*color += (brdf->myKa + brdf->myKe);
+	*color += (brdf.myKa + brdf.myKe);
 	// There is an intersection, loop through all light source
 	for (vector<Light*>::iterator l = myLights.begin(); l != myLights.end(); l++) {
-		(*l)->generateLightRay(myIn->localGeo, lray, lcolor);
+		(*l)->generateLightRay(myIn->localGeo, &lray, &lcolor);
 		// Check if the light is blocked or not
-		if (!myPrimitive->intersectP(*lray)) {
+		if (!myPrimitive->intersectP(lray)) {
 			// If not, do shading calculation for this
 			double att[3];
 			(*l)->getAttenuation(att);
-			double d = lray->pos.dist(myIn->localGeo.pos);
+			double d = lray.pos.dist(myIn->localGeo.pos);
 			double totalAtt = att[0] + att[1] * d + att[2] * pow(d, 2);
-			*color += shade(myIn->localGeo, *brdf, *lray, *lcolor, ray, totalAtt);
+			*color += shade(myIn->localGeo, brdf, lray, lcolor, ray, totalAtt);
 		}
 	}
 
-	Ray *reflectedRay = new Ray();
-	Color *tempColor = new Color();
+	/*Ray *reflectedRay = new Ray();
+	Color *tempColor = new Color();*/
+	Ray reflectedRay = Ray();
+	Color tempColor = Color();
 	// Handle mirror reflection
-	if (brdf->myKr > 0) {
-		*reflectedRay = createReflectedRay(myIn->localGeo, ray);
+	if (brdf.myKr > 0) {
+		reflectedRay = createReflectedRay(myIn->localGeo, ray);
 		//Make a recursive call to trace the reflected ray
-		trace(*reflectedRay, depth+1, tempColor);
-		*color += (brdf->myKr * (*tempColor));
+		trace(reflectedRay, depth+1, &tempColor);
+		*color += (brdf.myKr * (tempColor));
 	}
 
-	Ray *refractedRay = new Ray();
+	/*Ray *refractedRay = new Ray();
 	Color *tempColor2 = new Color();
+	bool *refract = new bool;*/
+	Ray refractedRay = Ray();
+	Color tempColor2 = Color();
 	bool *refract = new bool;
 	// Handle refraction next
-	if (brdf->myKrefract > 0) {
-		*refractedRay = createRefractedRay(myIn->localGeo, ray, brdf->myRIndex, refract);
+	if (brdf.myKrefract > 0) {
+		refractedRay = createRefractedRay(myIn->localGeo, ray, brdf.myRIndex, refract);
 		if (*refract == true){
-			trace(*refractedRay, depth+1, tempColor);
-			*color += (brdf->myKrefract * (*tempColor));
+			trace(refractedRay, depth+1, &tempColor);
+			*color += (brdf.myKrefract * (tempColor));
 		}
 	}
+	/*delete brdf;
+	delete lray;
+	delete lcolor;
+	delete reflectedRay;
+	delete refractedRay;
+	delete tempColor;
+	delete tempColor2;*/
+	delete refract;
 }
 
 Color RayTracer::shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray, double totalAttenuation)
