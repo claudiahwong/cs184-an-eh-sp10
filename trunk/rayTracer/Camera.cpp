@@ -65,11 +65,14 @@ void Camera::generateRay(Sample &sample, Ray *ray)
 
 	vec3 v;
 	cross(v, w, u);
-
+	
+	double z = screenHeight/2/tan(fovy/2*nv_to_rad);
+	double fovxTerm =  2 * atan(screenWidth/2/z);
+	//(fovy/2.0)*nv_to_rad* (screenWidth/((double) screenHeight))
 	//printf("u: (%f, %f, %f), v: (%f, %f, %f), w: (%f, %f, %f)\n", u.x, u.y, u.z, v.x, v.y, v.z, w.x, w.y, w.z);
 	//printf("sample: (%d, %d)\n", sample.x, sample.y);
 	double alpha, beta;
-	alpha = tan((fovy/2.0)*nv_to_rad* (screenWidth/((double) screenHeight)))*((sample.x-((double) screenWidth/2.0))/((double) screenWidth/2.0));
+	alpha = tan(fovxTerm/2)*((sample.x-((double) screenWidth/2.0))/((double) screenWidth/2.0));
 	//alpha = tan((fovy/2.0)*nv_to_rad)*((sample.x-((float) screenWidth/2.0))/((float) screenWidth/2.0));
 	beta = tan((fovy/2.0)*nv_to_rad)*((((double) screenHeight/2.0)-sample.y)/((double) screenHeight/2.0));
 	//printf("alpha: %f, beta: %f\n", alpha, beta);

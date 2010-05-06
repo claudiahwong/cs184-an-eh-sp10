@@ -70,8 +70,7 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 		// generate r'
 		float totalR, totalG, totalB;
 		totalR = totalG = totalB = 0.0;
-		Color currColor;
-		int num = 5;
+		int num = 20;
 		int i;
 		for (i = 0; i < num; i++){
 			vec3 w = reflectedRay.dir;
@@ -102,15 +101,14 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 				//Make a recursive call to trace the reflected ray
 			
 			trace(r_prime, depth+1, &tempColor);
-			currColor.setEqual(brdf.myKr * (tempColor));
-			totalR += currColor.r;
-			totalG += currColor.g;
-			totalB += currColor.b;
+			totalR += tempColor.r;
+			totalG += tempColor.g;
+			totalB += tempColor.b;
 			
 		}
-		totalR /= num;
-		totalG /= num;
-		totalB /= num;
+		totalR /= (float) num;
+		totalG /= (float) num;
+		totalB /= (float) num;
 		Color resultColor = Color(totalR, totalG, totalB);
 		*color += (brdf.myKr * (resultColor));
 		//}

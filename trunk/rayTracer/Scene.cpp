@@ -14,7 +14,7 @@ Scene::Scene(int sizex, int sizey)
 	strcpy(output_name, "out.ppm");
 	myMaxDepth = 5;
 
-	n = 2; // Default 4x Antialiasing
+	n = 2; // Default 2x Antialiasing
 	srand(time(NULL));
 }
 
@@ -121,8 +121,11 @@ void Scene::render() {
 	
 	int nSquared = n*n; // n^2 = samples per pixel
 	float epsilon;
-	
+	float x, y;
+
 	while(mySampler->getSample(mySample)) {
+		x = mySample->x;
+		y = mySample->y;
 		resultColor = new Color();
 		int p, q;
 		if (n > 1) { // This is the antialiasing code
@@ -133,9 +136,12 @@ void Scene::render() {
 					epsilon = (float)rand()/RAND_MAX;
 					mySample->x += ((p+epsilon)/(float)n);
 					mySample->y += ((q+epsilon)/(float)n);
+					
 					myCamera.generateRay(*mySample, myRay);
 					myRayTracer->trace(*myRay, 0, testingColor);
 					
+					mySample->x = x;
+					mySample->y = y;
 					totalR += testingColor->r;
 					totalG += testingColor->g;
 					totalB += testingColor->b;

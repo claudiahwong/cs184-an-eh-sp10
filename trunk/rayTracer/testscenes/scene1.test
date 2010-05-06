@@ -3,6 +3,8 @@
 
 size 640 480 
 
+antialias 4
+
 # Now specify the camera.  This is what you should implement.
 # This file has 4 camera positions.  Render your scene for all 4.
 
