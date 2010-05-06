@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include "Scene.h"
+#include <time.h>
 
 class Scene;
 

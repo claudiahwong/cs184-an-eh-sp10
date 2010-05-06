@@ -6,6 +6,7 @@ RayTracer::RayTracer(Scene* theScene, double *thit, Intersection *in, int maxDep
 	myIn = in;
 	myLights = theScene->myLightsVector;
 	myMaxDepth = maxDepth;
+	srand ( time(NULL) );
 }
 
 RayTracer::RayTracer(void)
@@ -65,9 +66,55 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 	// Handle mirror reflection
 	if (brdf.myKr > 0) {
 		reflectedRay = createReflectedRay(myIn->localGeo, ray);
-		//Make a recursive call to trace the reflected ray
-		trace(reflectedRay, depth+1, &tempColor);
-		*color += (brdf.myKr * (tempColor));
+		
+		// generate r'
+		float totalR, totalG, totalB;
+		totalR = totalG = totalB = 0.0;
+		Color currColor;
+		int num = 5;
+		int i;
+		for (i = 0; i < num; i++){
+			vec3 w = reflectedRay.dir;
+
+			vec3 u;
+			cross(u, ray.dir, w);
+			u.normalize();
+
+			vec3 v;
+			cross(v, w, u);
+
+			float a = 0.05;	// hard-coded a, which is the blurring factor for glossy reflection
+			float epsilon = (float)rand()/RAND_MAX;
+			float epsilon2 = (float)rand()/RAND_MAX;
+
+			float i = -a/2.0 + epsilon * a;
+			float j = -a/2.0 + epsilon2 * a;
+
+			Ray r_prime;
+			r_prime.dir = reflectedRay.dir + scale(u, i) + scale(v, j);
+			r_prime.dir.normalize();
+			r_prime.pos.myX = reflectedRay.pos.myX;
+			r_prime.pos.myY = reflectedRay.pos.myY;
+			r_prime.pos.myZ = reflectedRay.pos.myZ;
+
+			// check if r' hits the surface
+			//if (!myIn->primitive->intersectP(r_prime)) {
+				//Make a recursive call to trace the reflected ray
+			
+			trace(r_prime, depth+1, &tempColor);
+			currColor.setEqual(brdf.myKr * (tempColor));
+			totalR += currColor.r;
+			totalG += currColor.g;
+			totalB += currColor.b;
+			
+		}
+		totalR /= num;
+		totalG /= num;
+		totalB /= num;
+		Color resultColor = Color(totalR, totalG, totalB);
+		*color += (brdf.myKr * (resultColor));
+		//}
+		// if r' hit the surface { color += 0}
 	}
 
 	/*Ray *refractedRay = new Ray();

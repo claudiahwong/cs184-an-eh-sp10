@@ -7,7 +7,8 @@ directional -0.57735027  -0.57735027 0.57735027 0 0 1
 #directional 0.57735027  0.57735027 0.57735027 0 0 1
 #directional -3 3 1 .5 .5 .5 
 
-maxdepth 5
+maxdepth 7
+antialias 1
 
 ambient .1 .1 .1
 diffuse 1 0 1

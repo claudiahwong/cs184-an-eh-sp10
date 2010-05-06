@@ -311,7 +311,7 @@ void parsefile (FILE *fp) {
 			assert(num == 2);
 			assert(!strcmp(command, "antialias"));
 			mainScene->n = n;
-			printf("%dx Antialiasing Set\n");
+			printf("%dx Antialiasing Set\n", n);
 		}
 
 		//..................................................

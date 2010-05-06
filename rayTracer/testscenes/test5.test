@@ -6,6 +6,7 @@ directional 0.57735027 -0.57735027 -0.57735027 1 1 1
 directional -0.57735027  0.57735027  0.57735027 1 1 1
 
 maxdepth 5
+antialias 1
 
 ambient .1 .1 .1
 diffuse .5 0 0
@@ -43,7 +44,7 @@ shininess 50
 sphere -4 0 -17 1.5
 
 
-ambient 0 0 0
+ambient .2 .2 .2
 diffuse 0 0 0
 specular 0 0 0
 reflect 1 1 1
@@ -51,10 +52,10 @@ shininess 50
 
 maxverts 4
 
-vertex -6 -6 -21
-vertex 6 -6 -21
-vertex 6 6 -21
-vertex -6 6 -21
+vertex -6 -6 -19
+vertex 6 -6 -19
+vertex 6 6 -19
+vertex -6 6 -19
 
-tri 0 1 2
 tri 0 2 3
+tri 0 1 2
