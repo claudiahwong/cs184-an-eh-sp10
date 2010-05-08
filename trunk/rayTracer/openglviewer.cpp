@@ -408,8 +408,8 @@ void parsefile (FILE *fp) {
 
 		else if (!strcmp(command, "refract")) {
 			float refract[4] ;
-			int num = sscanf(line, "%s %f %f %f", command, refract, refract+1, refract+2) ;
-			assert(num == 4) ; assert (!strcmp(command, "refract")) ;
+			int num = sscanf(line, "%s %f %f %f %f", command, refract, refract+1, refract+2, refract+3) ;
+			assert(num == 5) ; assert (!strcmp(command, "refract")) ;
 			mainScene->currBRDF.myKrefract.setEqual(Color(refract[0], refract[1], refract[2]));
 			mainScene->currBRDF.myRIndex = refract[3]; 
 		}

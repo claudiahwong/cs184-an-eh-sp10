@@ -18,10 +18,7 @@ RayTracer::~RayTracer(void)
 }
 
 void RayTracer::trace(Ray& ray, int depth, Color* color) {
-	
-	/*BRDF *brdf = new BRDF();
-	Ray *lray = new Ray();
-	Color *lcolor = new Color();*/
+
 	BRDF brdf = BRDF();
 	Ray lray = Ray();
 	Color lcolor = Color();
@@ -59,65 +56,78 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 		}
 	}
 
-	/*Ray *reflectedRay = new Ray();
-	Color *tempColor = new Color();*/
 	Ray reflectedRay = Ray();
 	Color tempColor = Color();
 	// Handle mirror reflection
 	if (brdf.myKr > 0) {
 		reflectedRay = createReflectedRay(myIn->localGeo, ray);
-		
-		// generate r'
-		float totalR, totalG, totalB;
-		totalR = totalG = totalB = 0.0;
-		int num = 20;
-		int i;
-		for (i = 0; i < num; i++){
+		int glossy = 0;
+		if (glossy) {
+			// generate r'
+			float totalR, totalG, totalB;
+			totalR = 0.0;
+			totalG = 0.0;
+			totalB = 0.0;
+			int num = 1;
+
+			// Make a basis
 			vec3 w = reflectedRay.dir;
-
 			vec3 u;
-			cross(u, ray.dir, w);
+			vec3 ranVec = vec3(.00424, 1, .00764); // Hardcoded a random vector
+			cross(u, ranVec, w);
 			u.normalize();
-
 			vec3 v;
 			cross(v, w, u);
 
-			float a = 0.05;	// hard-coded a, which is the blurring factor for glossy reflection
-			float epsilon = (float)rand()/RAND_MAX;
-			float epsilon2 = (float)rand()/RAND_MAX;
-
-			float i = -a/2.0 + epsilon * a;
-			float j = -a/2.0 + epsilon2 * a;
-
 			Ray r_prime;
-			r_prime.dir = reflectedRay.dir + scale(u, i) + scale(v, j);
-			r_prime.dir.normalize();
 			r_prime.pos.myX = reflectedRay.pos.myX;
 			r_prime.pos.myY = reflectedRay.pos.myY;
 			r_prime.pos.myZ = reflectedRay.pos.myZ;
+			r_prime.t_min = 0;
+			r_prime.t_max = 8000;
+			float a = .0005;	// hard-coded a, which is the blurring factor for glossy reflection
+			int k, total;
+			total = 0;
 
-			// check if r' hits the surface
-			//if (!myIn->primitive->intersectP(r_prime)) {
-				//Make a recursive call to trace the reflected ray
-			
-			trace(r_prime, depth+1, &tempColor);
-			totalR += tempColor.r;
-			totalG += tempColor.g;
-			totalB += tempColor.b;
-			
+			for (k = 0; k < num; k++){
+				float epsilon = (float)rand()/RAND_MAX;
+				float epsilon2 = (float)rand()/RAND_MAX;
+
+				float i = -a/2.0 + epsilon * a;
+				float j = -a/2.0 + epsilon2 * a;
+
+				r_prime.dir = reflectedRay.dir + scale(u, i) + scale(v, j);
+				r_prime.dir.normalize();
+
+				// if r' is below the surface, make it above the surface
+				if (dot(r_prime.dir, myIn->localGeo.normal) < 0.0) {
+					r_prime.dir = reflectedRay.dir - scale(u, i) - scale(v, j);
+					r_prime.dir.normalize();
+				}
+
+				trace(r_prime, depth+1, &tempColor);
+				totalR += tempColor.r;
+				totalG += tempColor.g;
+				totalB += tempColor.b;
+				tempColor.r = 0;
+				tempColor.g = 0;
+				tempColor.b = 0;
+
+			}
+			totalR /= (float) num;
+			totalG /= (float) num;
+			totalB /= (float) num;
+			totalR *= (float) brdf.myKr.r;
+			totalG *= (float) brdf.myKr.g;
+			totalB *= (float) brdf.myKr.b;
+			Color resultColor = Color(totalR, totalG, totalB);
+			*color += ((resultColor));
+		} else {
+			trace(reflectedRay, depth+1, &tempColor);
+			*color += (brdf.myKr * (tempColor));
 		}
-		totalR /= (float) num;
-		totalG /= (float) num;
-		totalB /= (float) num;
-		Color resultColor = Color(totalR, totalG, totalB);
-		*color += (brdf.myKr * (resultColor));
-		//}
-		// if r' hit the surface { color += 0}
 	}
 
-	/*Ray *refractedRay = new Ray();
-	Color *tempColor2 = new Color();
-	bool *refract = new bool;*/
 	Ray refractedRay = Ray();
 	Color tempColor2 = Color();
 	bool *refract = new bool;
@@ -125,17 +135,10 @@ void RayTracer::trace(Ray& ray, int depth, Color* color) {
 	if (brdf.myKrefract > 0) {
 		refractedRay = createRefractedRay(myIn->localGeo, ray, brdf.myRIndex, refract);
 		if (*refract == true){
-			trace(refractedRay, depth+1, &tempColor);
-			*color += (brdf.myKrefract * (tempColor));
+			trace(refractedRay, depth+1, &tempColor2);
+			*color += (brdf.myKrefract * (tempColor2));
 		}
 	}
-	/*delete brdf;
-	delete lray;
-	delete lcolor;
-	delete reflectedRay;
-	delete refractedRay;
-	delete tempColor;
-	delete tempColor2;*/
 	delete refract;
 }
 
@@ -145,13 +148,13 @@ Color RayTracer::shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &r
 
 	vec3 half_angle = vec3(lray.dir - ray.dir);
 	half_angle.normalize();
-	
+
 	double ldirDotN = dot(lray.dir, local.normal); 
 	if (ldirDotN < 0) ldirDotN = 0;
 	double nDotHAngle = dot(local.normal, half_angle);
 	if (nDotHAngle < 0) nDotHAngle = 0;
 	double nDotHAngle_toShininess = pow(nDotHAngle, (double)brdf.myShininess);
-	
+
 	Color kdTerm;
 	kdTerm.setEqual(brdf.myKd * ldirDotN);
 	Color ksTerm;
@@ -183,7 +186,7 @@ Ray RayTracer::createReflectedRay(LocalGeo local, Ray &ray) {
 }
 
 Ray RayTracer::createRefractedRay(LocalGeo local, Ray &ray, float rindex, bool* refract) {
-	
+
 	float n = 1.0 / rindex;
 	vec3 N = vec3(local.normal);
 	if (dot(local.normal, ray.dir) > 0) {
