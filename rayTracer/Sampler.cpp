@@ -9,7 +9,7 @@ Sampler::Sampler(int sizex, int sizey)
 	tenPercent = totalPixels / 10;
 	level = 1;
 	toMilestone = 0;
-	
+
 }
 
 Sampler::~Sampler(void)

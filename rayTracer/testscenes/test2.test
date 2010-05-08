@@ -13,21 +13,21 @@ antialias 1
 ambient .1 .1 .1
 diffuse 1 0 1
 specular 1 1 1
-reflect 1 1 1
+reflect .9 .9 .9
 shininess 50
 sphere 0 0 -20 3
 
 ambient .1 .1 .1
 diffuse 1 1 0
 specular 1 1 1
-reflect 1 1 1
+reflect .9 .9 .9
 shininess 50
 sphere -2 2 -15 1
 
 ambient .1 .1 .1
 diffuse 0 1 1
 specular 1 1 1
-reflect 1 1 1
+reflect .9 .9 .9
 shininess 50
 sphere -2 -2 -15 1
 

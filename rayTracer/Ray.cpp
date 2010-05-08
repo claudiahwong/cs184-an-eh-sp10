@@ -1,7 +1,12 @@
 #include "Ray.h"
 
 Ray::Ray(void) {
-
+	pos.myX = 0;
+	pos.myY = 0;
+	pos.myZ = 0;
+	dir = vec3(0, 0, 0);
+	t_min = 0;
+	t_max = 8000;
 }
 
 Ray::Ray(Point position, vec3 direction, double min, double max)
