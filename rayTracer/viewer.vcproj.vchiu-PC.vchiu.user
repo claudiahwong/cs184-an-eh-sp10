@@ -39,7 +39,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="testscenes/test2.test"
+				CommandArguments="testscenes/box.test"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

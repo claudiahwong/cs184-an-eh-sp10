@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "Scene.h"
 #include <time.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 class Scene;
 
@@ -17,6 +19,7 @@ public:
 	RayTracer(Scene* theScene, double *thit, Intersection *in, int maxDepth);
 	RayTracer(void);
 	~RayTracer(void);
+	void pathTrace(Ray& ray, int depth, Color* color);
 	void trace(Ray& ray, int depth, Color* color);
 	Color shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray, double totalAttenuation);
 	Ray createReflectedRay(LocalGeo local, Ray &ray);
