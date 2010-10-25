@@ -111,8 +111,8 @@ void Scene::render() {
 	Color *resultColor = new Color(); // After averaging for antialiasing
 	//Color *testBlack = new Color(0, 0, 0);
 	
-	float totalR, totalG, totalB;
-	totalR = 0.0; totalG = 0.0; totalB = 0.0;
+	float totalR = 0.0, totalG = 0.0, totalB = 0.0;
+	//totalR = 0.0; totalG = 0.0; totalB = 0.0;
 	
 	Ray *myRay = new Ray();
 	double *thit = new double;
@@ -138,7 +138,8 @@ void Scene::render() {
 					mySample->y += ((q+epsilon)/(float)n);
 					
 					myCamera.generateRay(*mySample, myRay);
-					myRayTracer->trace(*myRay, 0, testingColor);
+					//myRayTracer->trace(*myRay, 0, testingColor);
+					myRayTracer->pathTrace(*myRay, 0, testingColor);
 					
 					mySample->x = x;
 					mySample->y = y;
@@ -160,7 +161,10 @@ void Scene::render() {
 			totalR = 0.0; totalG = 0.0; totalB = 0.0;
 		} else { // If antialiasing == 1, just do the old code without wasting computation
 			myCamera.generateRay(*mySample, myRay);
-			myRayTracer->trace(*myRay, 0, resultColor);
+			//myRayTracer->trace(*myRay, 0, resultColor);
+			//if (mySample->x == 74 && mySample->y == 65) {
+				myRayTracer->pathTrace(*myRay, 0, resultColor);
+			//}
 		}
 
 

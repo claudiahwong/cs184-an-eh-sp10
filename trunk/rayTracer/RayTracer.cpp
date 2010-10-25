@@ -17,6 +17,101 @@ RayTracer::~RayTracer(void)
 {
 }
 
+void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
+
+	BRDF brdf = BRDF();
+	Ray lray = Ray();
+	Color lcolor = Color();
+
+	if (!myPrimitive->intersect(ray, myThit, myIn)) {
+		// No intersection
+		//Make the color black and return
+		color->r = 0.0;
+		color->g = 0.0;
+		color->b = 0.0;
+		return;
+	}
+
+	// Obtain the brdf at intersection point
+	myIn->primitive->getBRDF(myIn->localGeo, &brdf);
+	Color mcolor = Color();
+
+	if (brdf.myType == 1)	// DIFF
+	{
+		mcolor.setEqual(brdf.myKd);
+	}
+
+	if (brdf.myType == 2)	// SPEC
+	{
+		mcolor.setEqual(brdf.myKs);
+	}
+
+	double p;
+	if (mcolor.r > mcolor.g && mcolor.r > mcolor.b) {
+		p = mcolor.r;
+	} else if (mcolor.g > mcolor.b) {
+		p = mcolor.g;
+	} else {
+		p = mcolor.b;
+	}
+
+	if (depth > myMaxDepth) {
+		//Russian Roulette
+		double r0 = (float)rand()/RAND_MAX;
+		if (r0 < p) {
+			mcolor /= p;
+		} else {
+			color->setEqual(brdf.myKe);
+			return;
+		}
+	}
+
+	// DIFFuse
+	if (brdf.myType == 1) {
+		double r1 = 2 * M_PI * (float)rand()/RAND_MAX;	// phi
+		double r2 = (float)rand()/RAND_MAX;	// z
+		double r3 = sqrt(r2);
+
+		vec3 w;
+		
+		if (dot(ray.dir, myIn->localGeo.normal) < 0) {	// NEED TO RE-CHECK
+			w = myIn->localGeo.normal;
+		} else {
+			w = -1*myIn->localGeo.normal;
+		}
+
+		vec3 u;
+		if (fabs(w.x) > 0.1) {
+			u = cross(u, vec3(0, 1, 0), w);
+		} else {
+			u = cross(u, vec3(1, 0, 0), w);
+		}
+		u.normalize();
+
+		vec3 v;
+		v = cross(v, w, u);
+
+		vec3 newRaydir = scale(u, cos(r1)*r3) + scale(v, sin(r1)*r3) + scale(w, sqrt(1-r2));
+		newRaydir.normalize();
+
+		Color tempColor = Color();
+		Ray tempRay = Ray();
+
+		vec3 pos = vec3(myIn->localGeo.pos.myX, myIn->localGeo.pos.myY, myIn->localGeo.pos.myZ);
+		vec3 resultingPos = pos + .01 * newRaydir;
+		Point Pos = Point(resultingPos.x, resultingPos.y, resultingPos.z);
+		pathTrace(Ray(Pos, newRaydir, 0, 8000), depth+1, &tempColor);
+		//*color += (brdf.myKr * (tempColor));
+		//*color = mcolor;
+		*color = brdf.myKe + (mcolor*tempColor);
+		return;
+	} else if (brdf.myType == 2) {
+		
+	}
+	//else if (obj.refl == SPEC)            // Ideal SPECULAR reflection 
+    // return obj.e + f.mult(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi));
+}
+
 void RayTracer::trace(Ray& ray, int depth, Color* color) {
 
 	BRDF brdf = BRDF();

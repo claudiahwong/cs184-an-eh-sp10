@@ -102,7 +102,8 @@ void parsefile (FILE *fp) {
 			BRDF *sphereBRDF = new BRDF(mainScene->currBRDF.myKd, mainScene->currBRDF.myKs, 
 				mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
 				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess,
-				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract);
+				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract,
+				mainScene->currBRDF.myType);
 			Material *sphereMat = new Material(sphereBRDF);
 			
 			mat4 current = mainScene->getCurrentMatrix();
@@ -198,7 +199,8 @@ void parsefile (FILE *fp) {
 			BRDF *triBRDF = new BRDF(mainScene->currBRDF.myKd, mainScene->currBRDF.myKs, 
 				mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
 				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess,
-				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract);
+				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract,
+				mainScene->currBRDF.myType);
 			Material *triMat = new Material(triBRDF);
 			GeometricPrimitive *triPrim = new GeometricPrimitive(newTriangle, triMat, objToWorld, worldToObj);
 			mainScene->addPrimitive(triPrim);
@@ -231,7 +233,8 @@ void parsefile (FILE *fp) {
 			BRDF *triBRDF = new BRDF(mainScene->currBRDF.myKd, mainScene->currBRDF.myKs, 
 				mainScene->currBRDF.myKa, mainScene->currBRDF.myKr, 
 				mainScene->currBRDF.myKe, mainScene->currBRDF.myShininess,
-				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract);
+				mainScene->currBRDF.myRIndex, mainScene->currBRDF.myKrefract,
+				mainScene->currBRDF.myType);
 			Material *triMat = new Material(triBRDF);
 			GeometricPrimitive *triPrim = new GeometricPrimitive(newTriangle, triMat, objToWorld, worldToObj);
 			mainScene->addPrimitive(triPrim);
@@ -412,6 +415,19 @@ void parsefile (FILE *fp) {
 			assert(num == 5) ; assert (!strcmp(command, "refract")) ;
 			mainScene->currBRDF.myKrefract.setEqual(Color(refract[0], refract[1], refract[2]));
 			mainScene->currBRDF.myRIndex = refract[3]; 
+		}
+
+		// for path tracer
+		else if (!strcmp(command, "DIFF")) {
+			int num = sscanf(line, "%s", command) ;
+			assert(num == 1) ; assert (!strcmp(command, "DIFF")) ;
+			mainScene->currBRDF.myType = 1; 
+		}
+
+		else if (!strcmp(command, "SPEC")) {
+			int num = sscanf(line, "%s", command) ;
+			assert(num == 1) ; assert (!strcmp(command, "SPEC")) ;
+			mainScene->currBRDF.myType = 2; 
 		}
 
 		//..................................................
