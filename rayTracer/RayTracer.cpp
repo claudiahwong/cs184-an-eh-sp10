@@ -59,12 +59,15 @@ void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
 		//Russian Roulette
 		double r0 = (float)rand()/RAND_MAX;
 		if (r0 < p) {
-			mcolor /= p;
+			mcolor = mcolor / p;
 		} else {
 			color->setEqual(brdf.myKe);
 			return;
 		}
 	}
+
+	Color tempColor = Color();
+	Ray tempRay = Ray();
 
 	// DIFFuse
 	if (brdf.myType == 1) {
@@ -94,19 +97,16 @@ void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
 		vec3 newRaydir = scale(u, cos(r1)*r3) + scale(v, sin(r1)*r3) + scale(w, sqrt(1-r2));
 		newRaydir.normalize();
 
-		Color tempColor = Color();
-		Ray tempRay = Ray();
-
 		vec3 pos = vec3(myIn->localGeo.pos.myX, myIn->localGeo.pos.myY, myIn->localGeo.pos.myZ);
 		vec3 resultingPos = pos + .01 * newRaydir;
 		Point Pos = Point(resultingPos.x, resultingPos.y, resultingPos.z);
 		pathTrace(Ray(Pos, newRaydir, 0, 8000), depth+1, &tempColor);
-		//*color += (brdf.myKr * (tempColor));
-		//*color = mcolor;
 		*color = brdf.myKe + (mcolor*tempColor);
 		return;
 	} else if (brdf.myType == 2) {
-		
+		pathTrace(createReflectedRay(myIn->localGeo, ray), depth+1, &tempColor);
+		*color = brdf.myKe + (mcolor*tempColor);
+		return;
 	}
 	//else if (obj.refl == SPEC)            // Ideal SPECULAR reflection 
     // return obj.e + f.mult(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi));
