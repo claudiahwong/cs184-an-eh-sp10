@@ -32,6 +32,7 @@ public:
 		   QuadAtt;
 	
 	vector<Light*> myLightsVector;
+	vector<Light*> myAreaLightsVector;
 	BRDF currBRDF;
 
 	vector<mat4> myMatrixStack;
@@ -44,6 +45,7 @@ public:
 	void setCamera(Camera *mainCam);
 	void addPrimitive(Primitive* prim);
 	void addLight(Light* light);
+	void addAreaLight(Light *light);
 	
 	void pushMatrix();
 	void popMatrix();

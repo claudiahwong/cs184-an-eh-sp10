@@ -40,6 +40,10 @@ void Scene::addLight(Light *light) {
 	myLightsVector.push_back(light);
 }
 
+void Scene::addAreaLight(Light *light) {
+	//myAreaLightsVector.push_back(light);
+}
+
 void Scene::pushMatrix() {
 	myMatrixStack.push_back(mat4(getCurrentMatrix()));
 }
@@ -132,10 +136,15 @@ void Scene::render() {
 			for (p = 0; p < n; p++)
 			{
 				for (q = 0; q < n; q++) {
-
+					
 					epsilon = (float)rand()/RAND_MAX;
-					mySample->x += ((p+epsilon)/(float)n);
-					mySample->y += ((q+epsilon)/(float)n);
+					mySample->x += epsilon;
+					mySample->y += epsilon;
+
+					// stratified
+					
+					//mySample->x += ((p+epsilon)/(float)n);
+					//mySample->y += ((q+epsilon)/(float)n);
 					
 					myCamera.generateRay(*mySample, myRay);
 					//myRayTracer->trace(*myRay, 0, testingColor);
@@ -146,9 +155,11 @@ void Scene::render() {
 					totalR += testingColor->r;
 					totalG += testingColor->g;
 					totalB += testingColor->b;
+					
 					testingColor->r = 0;
 					testingColor->g = 0;
 					testingColor->b = 0;
+					
 				}
 			}
 

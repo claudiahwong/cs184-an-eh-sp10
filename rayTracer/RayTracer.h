@@ -19,6 +19,8 @@ public:
 	RayTracer(Scene* theScene, double *thit, Intersection *in, int maxDepth);
 	RayTracer(void);
 	~RayTracer(void);
+	void directIllumination(Ray& ray, Color* color, BRDF brdf);
+	void pathTrace2(Ray& ray, int depth, Color* color, bool indirect);
 	void pathTrace(Ray& ray, int depth, Color* color);
 	void trace(Ray& ray, int depth, Color* color);
 	Color shade(LocalGeo local, BRDF brdf, Ray lray, Color lcolor, Ray &ray, double totalAttenuation);
