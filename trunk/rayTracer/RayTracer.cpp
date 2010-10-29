@@ -115,6 +115,13 @@ void RayTracer::directIllumination(Ray& ray, Color* color, BRDF brdf) {
 			double d = lray.pos.dist(myIn->localGeo.pos);
 			double totalAtt = att[0] + att[1] * d + att[2] * pow(d, 2);
 			*color += shade(myIn->localGeo, brdf, lray, lcolor, ray, totalAtt);
+
+			if (brdf.myKd != Color()) {
+				//*color += (brdf.myKd/M_PI)* intensity;
+			}
+			if (brdf.myKs != Color()) {
+
+			}
 		}
 	}
 }

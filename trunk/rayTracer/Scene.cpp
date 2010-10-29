@@ -138,13 +138,12 @@ void Scene::render() {
 				for (q = 0; q < n; q++) {
 					
 					epsilon = (float)rand()/RAND_MAX;
-					mySample->x += epsilon;
-					mySample->y += epsilon;
+					//mySample->x += epsilon;
+					//mySample->y += epsilon;
 
 					// stratified
-					
-					//mySample->x += ((p+epsilon)/(float)n);
-					//mySample->y += ((q+epsilon)/(float)n);
+					mySample->x += ((p+epsilon)/(float)n);
+					mySample->y += ((q+epsilon)/(float)n);
 					
 					myCamera.generateRay(*mySample, myRay);
 					//myRayTracer->trace(*myRay, 0, testingColor);
