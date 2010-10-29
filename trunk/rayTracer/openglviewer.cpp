@@ -430,6 +430,24 @@ void parsefile (FILE *fp) {
 			mainScene->currBRDF.myType = 2; 
 		}
 
+		else if (!strcmp(command, "D+S")) {
+			int num = sscanf(line, "%s", command) ;
+			assert(num == 1) ; assert (!strcmp(command, "D+S")) ;
+			mainScene->currBRDF.myType = 3; 
+		}
+
+		else if (!strcmp(command, "EMIS")) {
+			int num = sscanf(line, "%s", command) ;
+			assert(num == 1) ; assert (!strcmp(command, "EMIS")) ;
+			mainScene->currBRDF.myType = 4; 
+
+		}
+
+		else if (!strcmp(command, "REFL")) {
+			int num = sscanf(line, "%s", command) ;
+			assert(num == 1) ; assert (!strcmp(command, "REFL")) ;
+			mainScene->currBRDF.myType = 5; 
+		}
 		//..................................................
 
 		else {

@@ -17,6 +17,108 @@ RayTracer::~RayTracer(void)
 {
 }
 
+void RayTracer::pathTrace2(Ray& ray, int depth, Color* color, bool indirect) {
+	BRDF brdf = BRDF();
+	Ray lray = Ray();
+	Color lcolor = Color();
+
+	if (!myPrimitive->intersect(ray, myThit, myIn)) {
+		// No intersection
+		//Make the color black and return
+		color->r = 0.0;
+		color->g = 0.0;
+		color->b = 0.0;
+		return;
+	}
+
+	// Obtain the brdf at intersection point
+	myIn->primitive->getBRDF(myIn->localGeo, &brdf);
+	Color mcolor = Color();
+
+	// sampling indirect illumination but hit a light source
+	// return black
+	if (indirect && brdf.myType == 4) {
+		color->r = 0.0;
+		color->g = 0.0;
+		color->b = 0.0;
+		return;
+	}
+
+	// set color to emissive
+	color->setEqual(brdf.myKe);
+	//color->r = brdf.myKe.r;
+	//color->g = brdf.myKe.g;
+	//color->b = brdf.myKe.b;
+
+
+	// DIFF
+	if (brdf.myType == 1) {
+		mcolor.setEqual(brdf.myKd);
+	}
+
+	// SPEC
+	if (brdf.myType == 2) {
+		mcolor.setEqual(brdf.myKs);
+	}
+
+	// DIFF+SPEC
+	if (brdf.myType == 3){
+		mcolor.setEqual(brdf.myKd+brdf.myKs);
+	}
+
+	// REFL
+	if (brdf.myType == 5) {
+		mcolor.setEqual(brdf.myKr);
+	}
+
+	// get max term in mcolor
+	double p;
+	if (mcolor.r > mcolor.g && mcolor.r > mcolor.b) {
+		p = mcolor.r;
+	} else if (mcolor.g > mcolor.b) {
+		p = mcolor.g;
+	} else {
+		p = mcolor.b;
+	}
+
+	//Russian Roulette
+	if (depth > myMaxDepth) {
+		double r0 = (float)rand()/RAND_MAX;
+		if (r0 < p) {
+			mcolor = mcolor / p;
+		} else {
+			color->setEqual(brdf.myKe);
+			return;
+		}
+	}
+
+	// DIFFuse
+	if (brdf.myType == 1) {
+		// direct illumination
+		directIllumination(ray, color, brdf);
+
+		// indirect illumination
+	}
+}
+
+void RayTracer::directIllumination(Ray& ray, Color* color, BRDF brdf) {
+	Ray lray = Ray();
+	Color lcolor = Color();
+
+	for (vector<Light*>::iterator l = myLights.begin(); l != myLights.end(); l++) {
+		(*l)->generateLightRay(myIn->localGeo, &lray, &lcolor);
+		// Check if the light is blocked or not
+		if (!myPrimitive->intersectP(lray)) {
+			// If not, do shading calculation for this
+			double att[3];
+			(*l)->getAttenuation(att);
+			double d = lray.pos.dist(myIn->localGeo.pos);
+			double totalAtt = att[0] + att[1] * d + att[2] * pow(d, 2);
+			*color += shade(myIn->localGeo, brdf, lray, lcolor, ray, totalAtt);
+		}
+	}
+}
+
 void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
 
 	BRDF brdf = BRDF();
@@ -55,8 +157,8 @@ void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
 		p = mcolor.b;
 	}
 
+	//Russian Roulette
 	if (depth > myMaxDepth) {
-		//Russian Roulette
 		double r0 = (float)rand()/RAND_MAX;
 		if (r0 < p) {
 			mcolor = mcolor / p;
@@ -77,7 +179,7 @@ void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
 
 		vec3 w;
 		
-		if (dot(ray.dir, myIn->localGeo.normal) < 0) {	// NEED TO RE-CHECK
+		if (dot(ray.dir, myIn->localGeo.normal) < 0) {
 			w = myIn->localGeo.normal;
 		} else {
 			w = -1*myIn->localGeo.normal;
@@ -103,7 +205,7 @@ void RayTracer::pathTrace(Ray& ray, int depth, Color* color) {
 		pathTrace(Ray(Pos, newRaydir, 0, 8000), depth+1, &tempColor);
 		*color = brdf.myKe + (mcolor*tempColor);
 		return;
-	} else if (brdf.myType == 2) {
+	} else if (brdf.myType == 2) {	// reflection
 		pathTrace(createReflectedRay(myIn->localGeo, ray), depth+1, &tempColor);
 		*color = brdf.myKe + (mcolor*tempColor);
 		return;
