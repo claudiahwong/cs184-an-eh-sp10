@@ -92,4 +92,11 @@ public:
 		return (this->r > num || this->g > num || this->b > num);
 	}
 
+	const bool operator==(const Color &c1) {
+		return (this->r == c1.r && this->g == c1.g && this->b == c1.b);
+	}
+
+	const bool operator!=(const Color &c1) {
+		return (this->r != c1.r || this->g != c1.g || this->b != c1.b);
+	}
 };

@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AreaLight.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\BRDF.cpp"
 				>
 			</File>
@@ -312,6 +316,10 @@
 			>
 			<File
 				RelativePath=".\AggregatePrimitive.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AreaLight.h"
 				>
 			</File>
 			<File
