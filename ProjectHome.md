@@ -1,0 +1,1 @@
+A school project of a ray tracer.
